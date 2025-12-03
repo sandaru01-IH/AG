@@ -29,7 +29,11 @@ export default function LoginPage() {
         .rpc("get_user_email_by_username", { username_param: username })
         .single();
 
-      if (userError || !userData || !userData.email) {
+      // Type guard for userData with proper typing
+      type UserEmailResult = { email: string } | null;
+      const typedUserData = userData as UserEmailResult;
+      
+      if (userError || !typedUserData || !typedUserData.email) {
         toast({
           title: "Error",
           description: "Invalid username or password",
@@ -41,7 +45,7 @@ export default function LoginPage() {
 
       // Then sign in with email and password
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: userData.email,
+        email: typedUserData.email,
         password: password,
       });
 
